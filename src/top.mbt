@@ -136,15 +136,21 @@ fn Node::get[A : Show](self : Node[A]) -> A {
 }
 
 ///|
-fn Node::set[A : Show](self : Node[A], value : A) -> Unit {
-  self._value = value
-  for out_edge in self.out_edges() {
-    &VNode::dfs(out_edge)
+fn Node::set[A : Show + Eq](self : Node[A], value : A) -> Unit {
+  match self.state() {
+    Stale => self._value = value
+    Fresh if self._value != value => {
+      self._value = value
+      for out_edge in self.out_edges() {
+        &VNode::dfs(out_edge)
+      }
+    }
+    _ => ()
   }
 }
 
 ///|
-fn Node::modify[A : Show](self : Node[A], f : (A) -> A) -> Unit {
+fn Node::modify[A : Show + Eq](self : Node[A], f : (A) -> A) -> Unit {
   self.set(f(self.get()))
 }
 
