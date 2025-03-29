@@ -1,0 +1,19 @@
+package illusory0x0/graph
+
+// Values
+
+// Types and methods
+type Node[A]
+impl[A : Show] Show for Node[A]
+
+type State
+impl Compare for State
+impl Eq for State
+impl Hash for State
+impl Show for State
+
+// Type aliases
+
+// Traits
+trait VNode
+

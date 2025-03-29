@@ -1,5 +1,5 @@
 ///|
-struct Node[A] {
+priv struct Node[A] {
   mut _value : A
   mut _state : State
   mut _id : Int
@@ -8,13 +8,13 @@ struct Node[A] {
 } derive(Show)
 
 ///|
-enum State {
+priv enum State {
   Stale
   Fresh
 } derive(Eq, Compare, Show, Hash)
 
 ///|
-trait VNode {
+priv trait VNode {
   update(Self) -> Unit
   set_state(Self, State) -> Unit
   state(Self) -> State
@@ -165,25 +165,23 @@ fn map_log[A : Show, B : Show](
 test (t : @test.T) {
   let a = Node::from_val(1)
   t.writeln("EVAL BEGIN")
-  let b0 = a.map_log(t,fn {x => x *2})
-  let b1 = a.map_log(t,fn { x => x * 3})
-  let c = Node::from_fun(fn () {
+  let b0 = a.map_log(t, fn { x => x * 2 })
+  let b1 = a.map_log(t, fn { x => x * 3 })
+  let c = Node::from_fun(fn() {
     let v = b0.get() + b1.get()
     t.writeln(v)
-    v 
+    v
   })
   t.writeln("EVAL END\n")
   c.depend_on(b0)
   c.depend_on(b1)
-
   inspect!(c.get(), content="5")
-
-  t.writeln("EVAL BEGIN")
-  a.modify(fn { x => x + 5})
+  a.modify(fn { x => x + 5 })
   inspect!(a.get(), content="6")
   inspect!(c.state(), content="Stale")
-  t.writeln("EVAL END\n")
+  t.writeln("EVAL BEGIN")
   inspect!(c.get(), content="30")
+  t.writeln("EVAL END\n")
   inspect!(c.state(), content="Fresh")
   t.snapshot!(filename="test1.txt")
 }
