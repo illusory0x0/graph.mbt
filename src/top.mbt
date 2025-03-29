@@ -183,5 +183,8 @@ test (t : @test.T) {
   inspect!(c.get(), content="30")
   t.writeln("EVAL END\n")
   inspect!(c.state(), content="Fresh")
+  t.writeln("EVAL BEGIN")
+  inspect!(c.get(), content="30")
+  t.writeln("EVAL END\n")
   t.snapshot!(filename="test1.txt")
 }
