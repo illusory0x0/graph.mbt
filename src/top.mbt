@@ -194,3 +194,42 @@ test (t : @test.T) {
   t.writeln("EVAL END\n")
   t.snapshot!(filename="test1.txt")
 }
+
+///|
+test (t : @test.T) {
+  let s = Node::from_val(1)
+  let len = 1 << 2
+  t.writeln("EVAL BEGIN")
+  let arr = Array::makei(len, fn(i) { s.map_log(t, fn { x => x + i }) })
+  let sum = Node::from_fun(fn() {
+    let v = arr.fold(init=0, fn(acc, x) { acc + x.get() })
+    t.writeln(v)
+    v
+  })
+  inspect!(sum.get(), content="10")
+  t.writeln("EVAL END\n")
+  for x in arr {
+    sum.depend_on(x)
+  }
+  s.modify(fn { x => x + 1 })
+  t.writeln("EVAL BEGIN")
+  inspect!(sum.get(), content="14")
+  t.writeln("EVAL END\n")
+  t.snapshot!(filename="stress_test.txt")
+}
+
+///|
+test "stress test" {
+  let s = Node::from_val(1)
+  let len = 1 << 20
+  let arr = Array::makei(len, fn(i) { s.map(fn { x => x + i }) })
+  let sum = Node::from_fun(fn() {
+    arr.fold(init=0, fn(acc, x) { acc + x.get() })
+  })
+  inspect!(sum.get(), content="524288")
+  for x in arr {
+    sum.depend_on(x)
+  }
+  s.modify(fn { x => x + 1 })
+  inspect!(sum.get(), content="1572864")
+}
